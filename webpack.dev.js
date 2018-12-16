@@ -19,6 +19,11 @@ let mainConfig = {
     module: {
         rules: [
             {
+                test: /\.js$/,
+                exclude: /node_modules/,
+                use: "babel-loader"
+            },
+            {
                 test: /\.(jpg|png|svg|ico|icns)$/,
                 loader: 'file-loader',
                 options: {
@@ -53,6 +58,11 @@ let rendererConfig = {
     },
     module: {
         rules: [
+            {
+                test: /\.js$/,
+                exclude: /node_modules/,
+                use: "babel-loader"
+            },
             {
                 test: /\.jsx?$/,
                 loader: 'babel',

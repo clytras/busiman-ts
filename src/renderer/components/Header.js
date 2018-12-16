@@ -22,6 +22,7 @@ export default class Header extends React.Component {
 const styles = StyleSheet.create({
     headerContainer: {
         padding: 10,
-        borderBottom: `1px solid ${Globals.colors.frameBorders}`
+        borderBottom: `1px solid ${Globals.colors.frameBorders}`,
+        color: 'red'
     }
 });

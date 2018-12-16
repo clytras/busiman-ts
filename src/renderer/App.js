@@ -1,6 +1,7 @@
 import React from 'react'
+import ReactDOM from 'react-dom';
 import SplitterLayout from 'react-splitter-layout';
-//import NewWindow from 'react-new-window'
+import NewWindow from 'react-new-window'
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import { StyleSheet, css } from 'aphrodite/no-important';
 import {Strings} from '../lang/strings';
@@ -41,14 +42,38 @@ import './styles.scss';
 //     </div>
 // )
 
+function copyStyles(sourceDoc, targetDoc) {
+    Array.from(sourceDoc.styleSheets).forEach(styleSheet => {
+        console.log('Copying stylersheet', styleSheet);
+        if (styleSheet.cssRules) { // for <style> elements
+            const newStyleEl = sourceDoc.createElement('style');
+    
+            Array.from(styleSheet.cssRules).forEach(cssRule => {
+                // write the text of each rule into the body of the style element
+                newStyleEl.appendChild(sourceDoc.createTextNode(cssRule.cssText));
+            });
+    
+            targetDoc.head.appendChild(newStyleEl);
+        } else if (styleSheet.href) { // for <link> elements loading CSS from a URL
+            const newLinkEl = sourceDoc.createElement('link');
+    
+            newLinkEl.rel = 'stylesheet';
+            newLinkEl.href = styleSheet.href;
+            targetDoc.head.appendChild(newLinkEl);
+        }
+    });
+}
+
 class App extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            modal: false
+            modal: false,
+            modalsIndex: 0
         };
 
         this.toggle = this.toggle.bind(this);
+        this.openPopup = this.openPopup.bind(this);
     }
 
     componentWillMount() {
@@ -61,6 +86,22 @@ class App extends React.Component {
         });
     }
 
+
+
+    openPopup() {
+        //window.open('https://github.com', '_blank', 'nodeIntegration=no')
+
+        let modal = window.open('', `modal-${this.state.modalsIndex++}`, 'width=300,height=250')
+        
+
+        modal.document.write('<div id="hdr"></div>')
+        copyStyles(document, modal.document);
+
+        ReactDOM.render(
+            <Header/>,
+            modal.document.getElementById('hdr')
+        );
+    }
       
     render() {
         //window.open('https://github.com', '_blank', 'nodeIntegration=no')
@@ -79,23 +120,26 @@ class App extends React.Component {
                         secondaryInitialSize={75}
                         >
                         <SideNav/>
-                        <div><h4>Welcome to React, Electron and JS!! {Strings.Home}</h4></div>
+                        <div>
+                            <h4>Welcome to React, Electron and JS!!! {Strings.Home}</h4>
+                        
+                            <Button color="danger" onClick={this.openPopup}>{"Open Modal!!"}</Button>
+                            <Modal isOpen={this.state.modal} toggle={this.toggle} className={this.props.className}>
+                                <ModalHeader toggle={this.toggle}>Modal title</ModalHeader>
+                                <ModalBody>
+                                    Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                                </ModalBody>
+                                <ModalFooter>
+                                    <Button color="primary" onClick={this.toggle}>Do Something</Button>{' '}
+                                    <Button color="secondary" onClick={this.toggle}>Cancel</Button>
+                                </ModalFooter>
+                            </Modal>
+                        
+                        </div>
                     </SplitterLayout>
                 </div>
                 <Footer/>
 
-
-                {/*<Button color="danger" onClick={this.toggle}>{"Open Modal!!"}</Button>
-                <Modal isOpen={this.state.modal} toggle={this.toggle} className={this.props.className}>
-                    <ModalHeader toggle={this.toggle}>Modal title</ModalHeader>
-                    <ModalBody>
-                        Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-                    </ModalBody>
-                    <ModalFooter>
-                        <Button color="primary" onClick={this.toggle}>Do Something</Button>{' '}
-                        <Button color="secondary" onClick={this.toggle}>Cancel</Button>
-                    </ModalFooter>
-                </Modal>*/}
             </div>
         );
     }
