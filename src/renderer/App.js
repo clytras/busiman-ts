@@ -1,5 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom';
+import { copyStyles } from '../utils/DOM';
 import SplitterLayout from 'react-splitter-layout';
 import NewWindow from 'react-new-window'
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
@@ -8,6 +9,8 @@ import {Strings} from '../lang/strings';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import SideNav from './components/SideNav';
+
+import * as platform from 'platform';
 
 
 import {library} from '@fortawesome/fontawesome-svg-core'
@@ -42,27 +45,7 @@ import './styles.scss';
 //     </div>
 // )
 
-function copyStyles(sourceDoc, targetDoc) {
-    Array.from(sourceDoc.styleSheets).forEach(styleSheet => {
-        console.log('Copying stylersheet', styleSheet);
-        if (styleSheet.cssRules) { // for <style> elements
-            const newStyleEl = sourceDoc.createElement('style');
-    
-            Array.from(styleSheet.cssRules).forEach(cssRule => {
-                // write the text of each rule into the body of the style element
-                newStyleEl.appendChild(sourceDoc.createTextNode(cssRule.cssText));
-            });
-    
-            targetDoc.head.appendChild(newStyleEl);
-        } else if (styleSheet.href) { // for <link> elements loading CSS from a URL
-            const newLinkEl = sourceDoc.createElement('link');
-    
-            newLinkEl.rel = 'stylesheet';
-            newLinkEl.href = styleSheet.href;
-            targetDoc.head.appendChild(newLinkEl);
-        }
-    });
-}
+
 
 class App extends React.Component {
     constructor(props) {
@@ -122,6 +105,15 @@ class App extends React.Component {
                         <SideNav/>
                         <div>
                             <h4>Welcome to React, Electron and JS!!! {Strings.Home}</h4>
+                            <pre>{
+                                [platform.name,
+                                platform.version,
+                                platform.product,
+                                platform.manufacturer,
+                                platform.layout,
+                                platform.os,
+                                platform.description].join("\n")
+                            }</pre>
                         
                             <Button color="danger" onClick={this.openPopup}>{"Open Modal!!"}</Button>
                             <Modal isOpen={this.state.modal} toggle={this.toggle} className={this.props.className}>
